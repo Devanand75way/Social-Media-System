@@ -1,0 +1,40 @@
+{
+  "Users": [
+    {
+      "id": "f897",
+      "agreeToTerms": true,
+      "birthDate": "2001-02-02T18:30:00.000Z",
+      "confirmPassword": "test123",
+      "password": "test123",
+      "phone": "8965742314",
+      "email": "75way@gmail.com",
+      "username": "Devanand",
+      "fullName": "Devanand Kumar Rana"
+    },
+    {
+      "id": "cd7d",
+      "agreeToTerms": true,
+      "birthDate": "2002-02-02T18:30:00.000Z",
+      "confirmPassword": "test123",
+      "password": "test123",
+      "phone": "9632416578",
+      "email": "sumit@gmail.com",
+      "username": "sumit",
+      "fullName": "Sumit Kumar"
+    }
+  ],
+  "Post": [
+    {
+      "id": "1dbe",
+      "description": "hello ",
+      "image": "blob:http://localhost:5173/6eb07b0f-5906-415d-a7c4-7d1ce1fc740c",
+      "userId": "1"
+    },
+    {
+      "id": "57f4",
+      "description": "2nd image",
+      "image": "blob:http://localhost:5173/077bbc6c-85a5-42f2-a0a2-bbe5d0191840",
+      "userId": "1"
+    }
+  ]
+}

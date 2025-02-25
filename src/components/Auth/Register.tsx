@@ -6,8 +6,6 @@ import {
   TextField,
   Button,
   Paper,
-  FormControlLabel,
-  Checkbox,
   Avatar,
   IconButton,
 } from "@mui/material";
@@ -15,10 +13,9 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { useNavigate } from "react-router-dom";
 import Header from "../Header/Header";
-import { useRegisterUserMutation } from "../../services/api";
+import { useRegisterMutation } from "../../services/api";
 import { toast } from "react-toastify";
 import PasswordInput from "./PasswordInput";
 
@@ -26,7 +23,6 @@ type FormData = typeof schema.__outputType;
 
 // Validation Schema using Yup
 const schema = yup.object().shape({
-  fullName: yup.string().required("Full Name is required"),
   username: yup.string().required("Username is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   phone: yup
@@ -36,13 +32,7 @@ const schema = yup.object().shape({
     .string()
     .min(6, "At least 6 characters required")
     .required("Password is required"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match"),
-  birthDate: yup.date().required("Date of Birth is required"),
-  agreeToTerms: yup
-    .boolean()
-    .oneOf([true], "You must accept the terms & conditions"),
+
 });
 
 const SignupForm = () => {
@@ -53,14 +43,9 @@ const SignupForm = () => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      fullName: "",
       username: "",
       email: "",
-      phone: "",
       password: "",
-      confirmPassword: "",
-      birthDate: undefined,
-      agreeToTerms: false,
     },
     resolver: yupResolver(schema),
   });
@@ -70,12 +55,13 @@ const SignupForm = () => {
     navigate("/join");
   };
 
-  const [FeedUser] = useRegisterUserMutation();
+  const [FeedUser] = useRegisterMutation();
   console.log(FeedUser);
 
   const onSubmit = async (data: FormData) => {
     try {
-      await FeedUser(data);
+      const result = await FeedUser(data);
+      console.log(result)
       toast.success("User Registered");
     } catch (error) {
       console.log(error);
@@ -150,7 +136,7 @@ const SignupForm = () => {
                 Create Your Account
               </Typography>
 
-              {/* Profile Picture Upload */}
+              {/* Profile Picture Upload
               <Box>
                 <IconButton component="label">
                   <Avatar sx={styles.avatarUpload}>
@@ -162,7 +148,7 @@ const SignupForm = () => {
                     onChange={(e) => setValue("profilePic", e.target.files[0])}
                   />
                 </IconButton>
-              </Box>
+              </Box> */}
 
               {/* Form */}
               <Box
@@ -170,14 +156,7 @@ const SignupForm = () => {
                 onSubmit={handleSubmit(onSubmit)}
                 sx={styles.form}
               >
-                <TextField
-                  label="Full Name"
-                  variant="outlined"
-                  fullWidth
-                  {...register("fullName")}
-                  error={!!errors.fullName}
-                  helperText={errors.fullName?.message}
-                />
+                
                 <TextField
                   label="Username"
                   variant="outlined"
@@ -195,25 +174,8 @@ const SignupForm = () => {
                   error={!!errors.email}
                   helperText={errors.email?.message}
                 />
-                <TextField
-                  label="Phone Number"
-                  type="tel"
-                  variant="outlined"
-                  fullWidth
-                  {...register("phone")}
-                  error={!!errors.phone}
-                  helperText={errors.phone?.message}
-                />
-                <TextField
-                  label="Date of Birth"
-                  type="date"
-                  variant="outlined"
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                  {...register("birthDate")}
-                  error={!!errors.birthDate}
-                  helperText={errors.birthDate?.message}
-                />
+                
+                
                 {/* Password Field with Show/Hide Icon */}
                 <PasswordInput
                   label="Password"
@@ -225,25 +187,7 @@ const SignupForm = () => {
                   error={!!errors.password}
                   helperText={errors.password?.message}
                 />
-                <TextField
-                  label="Confirm Password"
-                  type="password"
-                  variant="outlined"
-                  fullWidth
-                  {...register("confirmPassword")}
-                  error={!!errors.confirmPassword}
-                  helperText={errors.confirmPassword?.message}
-                />
-
-                <FormControlLabel
-                  control={<Checkbox {...register("agreeToTerms")} />}
-                  label="I agree to the Terms & Conditions"
-                />
-                {errors.agreeToTerms && (
-                  <Typography color="error">
-                    {errors.agreeToTerms.message}
-                  </Typography>
-                )}
+                
 
                 <Button
                   type="submit"

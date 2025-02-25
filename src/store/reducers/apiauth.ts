@@ -1,18 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { apiSlice } from "../../services/api";
+import { api } from "../../services/api";
 
 interface AuthState {
-  token: string | null;
+  accessToken: string;
+  refreshToken: string;
   isAuthenticated: boolean;
   loading: boolean;
+  userId: number;
 }
 
 const initialState: AuthState = {
-  token: localStorage.getItem("token"),
-  isAuthenticated: Boolean(localStorage.getItem("token")),
+  accessToken: localStorage.getItem("accesstoken") ?? "",
+  refreshToken: localStorage.getItem("refreshtoken") ?? "",
+  isAuthenticated: Boolean(localStorage.getItem("accessToken")),
   loading: false,
+  userId: null,
 };
-
 export const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -22,40 +25,40 @@ export const authSlice = createSlice({
     },
     setTokens: (state, action: PayloadAction<{ token: string }>) => {
       localStorage.setItem("token", action.payload.token);
-      state.token = action.payload.token;
+      state.accessToken = action.payload.token;
       state.isAuthenticated = true;
     },
     resetToken: (state) => {
       localStorage.removeItem("token");
-      state.token = null;
+      state.accessToken = "";
       state.isAuthenticated = false;
     },
     logout: (state) => {
       localStorage.removeItem("token");
-      state.token = null;
+      state.accessToken = "";
       state.isAuthenticated = false;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addMatcher(apiSlice.endpoints.loginUser.matchPending, (state) => {
+      .addMatcher(api.endpoints.login.matchPending, (state) => {
         state.loading = true;
       })
-      .addMatcher(apiSlice.endpoints.loginUser.matchFulfilled, (state, action) => {
-        const { token } = action.payload;
-        localStorage.setItem("token", token);
-        state.token = token;
+      .addMatcher(api.endpoints.login.matchFulfilled, (state, action) => {
+        const { accesstoken } = action.payload;
+        localStorage.setItem("token", accesstoken);
+        state.accessToken =accesstoken;
         state.isAuthenticated = true;
         state.loading = false;
       })
-      .addMatcher(apiSlice.endpoints.loginUser.matchRejected, (state) => {
-        state.token = null;
+      .addMatcher(api.endpoints.login.matchRejected, (state) => {
+        state.accessToken = "";
         state.isAuthenticated = false;
         state.loading = false;
       })
-      .addMatcher(apiSlice.endpoints.logout.matchFulfilled, (state) => {
+      .addMatcher(api.endpoints.logout.matchFulfilled, (state) => {
         localStorage.removeItem("token");
-        state.token = null;
+        state.accessToken = "";
         state.isAuthenticated = false;
         state.loading = false;
       });

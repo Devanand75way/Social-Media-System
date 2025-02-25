@@ -9,7 +9,7 @@ const Basiclayout = () => {
   React.useEffect(() => {
     // Check if user is authenticated
     if (isAuthenticated) {
-      navigate("/");
+      navigate("/homepage");
     }
   }, [isAuthenticated]);
 

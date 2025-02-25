@@ -30,7 +30,15 @@ const Header = () => {
     <div>
       {" "}
       {/* Navbar */}
-      <AppBar position="sticky" sx={{ background: "#fff", color: "#000" }}>
+      <AppBar position="fixed"
+      sx={{
+        background: "#fff",
+        color: "#000",
+        top: 0,
+        width: "100%",
+        zIndex: 1100, // Ensure it's above other components
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+      }}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Logo

@@ -57,7 +57,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          style={{ textAlign: "center", marginTop: "40px" }}
+          style={{ textAlign: "center", marginTop: "120px" }}
         >
           <Typography variant="h4" fontWeight="bold">
             Connect, Share, and Discover Your World

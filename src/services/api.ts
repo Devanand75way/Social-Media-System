@@ -1,88 +1,87 @@
 import { fetchBaseQuery, createApi } from "@reduxjs/toolkit/query/react";
-// import { RootState } from "../store/store";
-import { CreatePostData, LoginRequest, LoginResponse, PostResponse, RegisterUserData } from "../type";
+import { RootState } from "../store/store";
+import { ApiResponse, User, Post, Comment, Like, Follower, Notification } from "../type";
 
-const baseUrl = "http://localhost:3000";
-
-export const apiSlice = createApi({
+const baseurl = import.meta.env.VITE_SERVER_URL;
+console.log("baseurl", baseurl)
+// http://localhost:5000/api/register
+// http://localhost:5000/api
+export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: baseUrl,
+    baseUrl: baseurl,
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).auth.accessToken;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
-  tagTypes: ["Users", "Posts"],
+
   endpoints: (builder) => ({
-    registerUser: builder.mutation<{ success: boolean; message: string }, RegisterUserData>({
-      query: (userData) => ({
-        url: "/Users",
+    register: builder.mutation<User, Partial<User>>({
+      query: (body) => ({
+        url: "/register",
         method: "POST",
-        body: userData,
+        body,
       }),
     }),
-
-    // Login mutation
-    loginUser: builder.mutation<LoginResponse, LoginRequest>({
-      queryFn: async (credentials) => {
-        try {
-          // Fetch user by email
-          const response = await fetch(
-            `http://localhost:3000/Users?email=${credentials.email}`
-          );
-          const users = await response.json();
-
-          // Check if user exists
-          if (users.length === 0) {
-            return { error: { status: 404, data: { message: "User not found" } } };
-          }
-          const user = users[0];
-          // Check if password matches
-          if (user.password !== credentials.password) {
-            return { error: { status: 401, data: { message: "Invalid password" } } };
-          }
-
-          // Generate a fake token (For real apps, use JWT)
-          const fakeToken = btoa(user.email); // Base64 encode email as token
-
-          return {
-            data: {
-              success: true,
-              user: {
-                id: user.id,
-                fullName: user.fullName,
-                email: user.email,
-                token: fakeToken,
-              },
-              message: "Login successful",
-            },
-          };
-        } catch (err) {
-          return { error: { status: 500, data: { message: "something went wrong" } } };
-        }
-      },
+    login: builder.mutation<
+      ApiResponse<{ accesstoken: string; refreshtoken: string; id: number }>,
+      { email: string; password: string }
+    >({
+      query: (body) => ({
+        url: "/login",
+        method: "POST",
+        body,
+      }),
     }),
-    //  Logout mutation 
-    logout: builder.mutation({
+    logout: builder.mutation<void, void>({
       query: () => ({
-        url: "/",
+        url: "/users/logout",
         method: "POST",
       }),
     }),
-
-    // Post routes
-    createPost: builder.mutation<PostResponse, CreatePostData>({
-      query: (postData) => ({
-        url: "/Post",
+    createPost: builder.mutation<Post, Partial<Post>>({
+      query: (body) => ({
+        url: "/posts/",
         method: "POST",
-        body: postData,
+        body,
       }),
-      invalidatesTags: ["Posts"],
     }),
-    getAllPosts: builder.query({
-      query: () => "/Post",
-      providesTags: ["Posts"],
+    likePost: builder.mutation<Like, { postId: string }>({
+      query: ({ postId }) => ({
+        url: `/posts/${postId}/like`,
+        method: "POST",
+      }),
+    }),
+    commentOnPost: builder.mutation<Comment, { postId: string; text: string }>({
+      query: ({ postId, text }) => ({
+        url: `/posts/${postId}/comment`,
+        method: "POST",
+        body: { text },
+      }),
+    }),
+    followUser: builder.mutation<Follower, { userId: string }>({
+      query: ({ userId }) => ({
+        url: `/users/${userId}/follow`,
+        method: "POST",
+      }),
+    }),
+    getNotifications: builder.query<Notification[], void>({
+      query: () => "/notifications/",
     }),
   }),
 });
 
-export const { useRegisterUserMutation, useLoginUserMutation, useLogoutMutation, useCreatePostMutation, useGetAllPostsQuery } = apiSlice;
-
-
+export const {
+  useRegisterMutation,
+  useLoginMutation,
+  useLogoutMutation,
+  useCreatePostMutation,
+  useLikePostMutation,
+  useCommentOnPostMutation,
+  useFollowUserMutation,
+  useGetNotificationsQuery,
+} = api;

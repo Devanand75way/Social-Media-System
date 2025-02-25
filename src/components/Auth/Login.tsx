@@ -13,7 +13,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import Header from "../Header/Header";
-import { useLoginUserMutation } from "../../services/api";
+import { useLoginMutation } from "../../services/api";
 import { toast } from "react-toastify";
 import PasswordInput from "./PasswordInput";
 
@@ -44,25 +44,26 @@ const LoginForm = () => {
 
   const navigate = useNavigate();
 
-  const [Authuser, { isError }] = useLoginUserMutation();
+  const [Authuser] = useLoginMutation();
   
   const onSubmit = async (data: FormData) => {
     try {
-      // Unwrap ensures that errors are thrown correctly
-      const res = await Authuser(data).unwrap();
-      
-      // Check success response
-      toast.success("Login Successful");
-      localStorage.setItem("token", res.user.token);
-      localStorage.setItem("user", JSON.stringify(res.user));
+      await Authuser(data).unwrap();
+      toast.success("Logged in successfully");
       navigate("/");
-      
     } catch (error: any) {
-      // Handle error correctly
-      const errorMessage = error?.data?.message || "An error occurred";
+      console.error("Error Response:", error); // Log the entire error object
+  
+      // Check different possible structures
+      const errorMessage =
+        error?.data?.message ||  
+        error?.error ||          
+        "An error occurred";     
+  
       toast.error(errorMessage);
     }
   };
+  
   
 
 

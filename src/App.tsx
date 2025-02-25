@@ -11,6 +11,7 @@ const App = () => {
   return (
     <Routes>
       <Route element={<Authenticate />}>
+        <Route path="/homepage" element={<HomePage />} />
         <Route path="/posts" element={<Post />} />
         <Route path="/profile" element={<Profile/>}/>
       </Route>
